@@ -1,0 +1,15 @@
+{
+  "routes": [
+    { "route": "/services", "rewrite": "/services.html" },
+    { "route": "/service-area", "rewrite": "/service-area.html" },
+    { "route": "/insurance", "rewrite": "/insurance.html" },
+    { "route": "/about", "rewrite": "/about.html" },
+    { "route": "/contact", "rewrite": "/contact.html" }
+  ],
+  "navigationFallback": { "rewrite": "/index.html", "exclude": ["*.css","*.js","*.png","*.jpg","*.svg"] },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Cache-Control": "public, max-age=3600"
+  }
+}
