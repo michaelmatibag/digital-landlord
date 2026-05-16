@@ -2,6 +2,7 @@
   "name": "digital-landlord",
   "private": true,
   "scripts": {
+    "prepare": "node scripts/sync-layout.js",
     "format": "prettier --write \"**/*.{html,css,js,json}\"",
     "format:check": "prettier --check \"**/*.{html,css,js,json}\""
   },

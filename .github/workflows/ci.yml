@@ -4,13 +4,11 @@ on:
   push:
     branches: [main]
   pull_request:
-    types: [opened, synchronize, reopened, closed]
     branches: [main]
 
 jobs:
-  # ── Format check ────────────────────────────────────────────────────────────
+  # ── Format check (runs on PRs and pushes to main) ───────────────────────────
   lint:
-    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,46 +19,41 @@ jobs:
       - run: npm ci
       - run: npm run format:check
 
-  # ── Detect which sites changed ───────────────────────────────────────────────
-  # Outputs a JSON array of site folder names, e.g. ["lubbockbiohazardcleanup"]
-  # If anything under shared/ changed, all sites are included.
+  # ── Detect which sites changed (push to main only) ──────────────────────────
+  # Add a new filter entry here whenever a new site folder is created.
+  # If anything under shared/ changed, all sites are deployed.
   detect:
-    if: github.event.action != 'closed'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
-      sites: ${{ steps.changed.outputs.sites }}
+      sites: ${{ steps.sites.outputs.sites }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v4
+        id: filter
         with:
-          fetch-depth: 0
-      - id: changed
+          filters: |
+            lubbockbiohazardcleanup:
+              - 'sites/lubbockbiohazardcleanup/**'
+            shared:
+              - 'shared/**'
+      - id: sites
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            DIFF=$(git diff --name-only "origin/${{ github.base_ref }}"...HEAD)
-          elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
-            # First push to branch — deploy every site
-            DIFF=$(find sites -mindepth 1 -maxdepth 1 -type d -printf '%P\n' | sed 's|^|sites/|')
+          CHANGES='${{ steps.filter.outputs.changes }}'
+          if echo "$CHANGES" | jq -e 'contains(["shared"])' > /dev/null; then
+            SITES=$(ls sites/ | jq -R . | jq -sc .)
           else
-            DIFF=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}")
+            SITES=$(echo "$CHANGES" | jq '[.[] | select(. != "shared")]')
           fi
+          echo "sites=$SITES" >> "$GITHUB_OUTPUT"
+          echo "Changed sites: $SITES"
 
-          if echo "$DIFF" | grep -q "^shared/"; then
-            SITES=$(ls sites/)
-          else
-            SITES=$(echo "$DIFF" | grep "^sites/" | cut -d/ -f2 | sort -u)
-          fi
-
-          JSON=$(echo "$SITES" | grep -v '^$' | jq -R . | jq -sc .)
-          echo "sites=$JSON" >> "$GITHUB_OUTPUT"
-          echo "Changed sites: $JSON"
-
-  # ── Deploy changed sites ─────────────────────────────────────────────────────
+  # ── Deploy changed sites (push to main only) ────────────────────────────────
   # Secret per site: AZURE_STATIC_WEB_APPS_API_TOKEN_<folder-name>
   # e.g. AZURE_STATIC_WEB_APPS_API_TOKEN_lubbockbiohazardcleanup
   deploy:
     needs: [lint, detect]
     if: |
-      github.event.action != 'closed' &&
       needs.detect.outputs.sites != '[]' &&
       needs.detect.outputs.sites != ''
     runs-on: ubuntu-latest
@@ -73,6 +66,13 @@ jobs:
         with:
           submodules: true
           lfs: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Sync shared layout into site
+        run: node scripts/sync-layout.js
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -86,40 +86,10 @@ jobs:
   # ── Stable rollup for branch protection ─────────────────────────────────────
   # Branch protection requires a fixed job name. Matrix job names are dynamic
   # ("Deploy lubbockbiohazardcleanup"), so this job provides a stable target.
+  # On PRs, deploy is skipped entirely — lint passing is the only gate.
   deploy-complete:
     needs: deploy
-    if: |
-      always() &&
-      github.event.action != 'closed' &&
-      (needs.deploy.result == 'success' || needs.deploy.result == 'skipped')
+    if: always() && (needs.deploy.result == 'success' || needs.deploy.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - run: echo "All deploys passed or no sites changed."
-
-  # ── Close PR preview environments ────────────────────────────────────────────
-  list-sites:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    runs-on: ubuntu-latest
-    outputs:
-      sites: ${{ steps.list.outputs.sites }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: list
-        run: |
-          JSON=$(ls sites/ | jq -R . | jq -sc .)
-          echo "sites=$JSON" >> "$GITHUB_OUTPUT"
-
-  close-pr:
-    needs: list-sites
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        site: ${{ fromJson(needs.list-sites.outputs.sites) }}
-    name: Close PR for ${{ matrix.site }}
-    steps:
-      - name: Close ${{ matrix.site }} preview
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets[format('AZURE_STATIC_WEB_APPS_API_TOKEN_{0}', matrix.site)] }}
-          action: close
