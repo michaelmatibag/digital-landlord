@@ -4,7 +4,7 @@
     { "route": "/service-area", "rewrite": "/service-area.html" },
     { "route": "/insurance", "rewrite": "/insurance.html" },
     { "route": "/about", "rewrite": "/about.html" },
-    { "route": "/contact", "rewrite": "/contact.html" },
+    { "route": "/contact", "rewrite": "/contact.html" }
   ],
   "responseOverrides": {
     "404": {
