@@ -6,7 +6,10 @@
     { "route": "/about", "rewrite": "/about.html" },
     { "route": "/contact", "rewrite": "/contact.html" }
   ],
-  "navigationFallback": { "rewrite": "/index.html", "exclude": ["*.css","*.js","*.png","*.jpg","*.svg"] },
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["*.css", "*.js", "*.png", "*.jpg", "*.svg"]
+  },
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "SAMEORIGIN",

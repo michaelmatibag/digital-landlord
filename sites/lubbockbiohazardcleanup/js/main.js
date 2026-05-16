@@ -9,7 +9,7 @@ if (hamburger && mobileNav) {
 
 // Contact form handler (Formspree)
 const forms = document.querySelectorAll('.contact-form');
-forms.forEach(form => {
+forms.forEach((form) => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = form.querySelector('button[type="submit"]');
@@ -20,10 +20,10 @@ forms.forEach(form => {
       const res = await fetch('https://formspree.io/f/xzdonzkp', {
         method: 'POST',
         body: new FormData(form),
-        headers: { 'Accept': 'application/json' }
+        headers: { Accept: 'application/json' },
       });
       if (res.ok) {
-        btn.textContent = '✓ Message Sent — We\'ll Call You Shortly';
+        btn.textContent = "✓ Message Sent — We'll Call You Shortly";
         btn.style.background = '#27ae60';
         form.reset();
       } else {
@@ -40,9 +40,12 @@ forms.forEach(form => {
 });
 
 // Smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
+document.querySelectorAll('a[href^="#"]').forEach((a) => {
+  a.addEventListener('click', (e) => {
     const target = document.querySelector(a.getAttribute('href'));
-    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   });
 });

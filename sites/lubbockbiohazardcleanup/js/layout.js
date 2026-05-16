@@ -1,14 +1,14 @@
 // ── PHONE NUMBER ──
 const PHONE_DISPLAY = '(806) 545-8406';
-const PHONE_HREF    = 'tel:+18065458406';
-const PHONE_LABEL   = 'Available 24 hours, 7 days a week';
+const PHONE_HREF = 'tel:+18065458406';
+const PHONE_LABEL = 'Available 24 hours, 7 days a week';
 
 // ── BUSINESS INFO ──
-const BUSINESS_NAME    = 'Lubbock Biohazard Cleanup';
+const BUSINESS_NAME = 'Lubbock Biohazard Cleanup';
 const BUSINESS_TAGLINE = 'Professional Crime Scene & Biohazard Cleanup';
-const BUSINESS_CITY    = 'Lubbock, TX';
+const BUSINESS_CITY = 'Lubbock, TX';
 const BUSINESS_ADDRESS = 'Lubbock, TX 79401';
-const BUSINESS_EMAIL   = 'info@lubbockbiohazardcleanup.com';
+const BUSINESS_EMAIL = 'info@lubbockbiohazardcleanup.com';
 
 function renderEmergencyBar() {
   return `
@@ -21,16 +21,18 @@ function renderEmergencyBar() {
 
 function renderHeader(activePage = '') {
   const nav = [
-    { href: 'index.html',        label: 'Home' },
-    { href: 'services.html',     label: 'Services' },
+    { href: 'index.html', label: 'Home' },
+    { href: 'services.html', label: 'Services' },
     { href: 'service-area.html', label: 'Service Area' },
-    { href: 'insurance.html',    label: 'Insurance' },
-    { href: 'about.html',        label: 'About' },
+    { href: 'insurance.html', label: 'Insurance' },
+    { href: 'about.html', label: 'About' },
   ];
-  const navLinks = nav.map(n => {
-    const active = n.label.toLowerCase() === activePage.toLowerCase() ? ' active' : '';
-    return `<a href="${n.href}" class="${active}">${n.label}</a>`;
-  }).join('');
+  const navLinks = nav
+    .map((n) => {
+      const active = n.label.toLowerCase() === activePage.toLowerCase() ? ' active' : '';
+      return `<a href="${n.href}" class="${active}">${n.label}</a>`;
+    })
+    .join('');
 
   return `
   <header class="site-header">
@@ -99,50 +101,71 @@ function renderFooter() {
 
 function renderSchema() {
   const schema = {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": BUSINESS_NAME,
-    "description": "Professional crime scene cleanup, biohazard remediation, and trauma scene cleaning services in Lubbock, Texas. Available 24/7.",
-    "url": "https://www.lubbockbiohazardcleanup.com",
-    "telephone": "+18065458406",
-    "email": BUSINESS_EMAIL,
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "",
-      "addressLocality": "Lubbock",
-      "addressRegion": "TX",
-      "postalCode": "79401",
-      "addressCountry": "US"
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: BUSINESS_NAME,
+    description:
+      'Professional crime scene cleanup, biohazard remediation, and trauma scene cleaning services in Lubbock, Texas. Available 24/7.',
+    url: 'https://www.lubbockbiohazardcleanup.com',
+    telephone: '+18065458406',
+    email: BUSINESS_EMAIL,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '',
+      addressLocality: 'Lubbock',
+      addressRegion: 'TX',
+      postalCode: '79401',
+      addressCountry: 'US',
     },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": 33.5779,
-      "longitude": -101.8552
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 33.5779,
+      longitude: -101.8552,
     },
-    "openingHoursSpecification": {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-      "opens": "00:00",
-      "closes": "23:59"
+    openingHoursSpecification: {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '00:00',
+      closes: '23:59',
     },
-    "areaServed": [
-      "Lubbock, TX", "Wolfforth, TX", "Shallowater, TX",
-      "Slaton, TX", "Levelland, TX", "Brownfield, TX",
-      "Lamesa, TX", "Post, TX"
+    areaServed: [
+      'Lubbock, TX',
+      'Wolfforth, TX',
+      'Shallowater, TX',
+      'Slaton, TX',
+      'Levelland, TX',
+      'Brownfield, TX',
+      'Lamesa, TX',
+      'Post, TX',
     ],
-    "priceRange": "$$",
-    "paymentAccepted": "Insurance, Cash, Credit Card",
-    "hasOfferCatalog": {
-      "@type": "OfferCatalog",
-      "name": "Biohazard Cleanup Services",
-      "itemListElement": [
-        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Crime Scene Cleanup Lubbock TX" } },
-        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Biohazard Cleanup Lubbock TX" } },
-        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Suicide Cleanup Lubbock TX" } },
-        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Unattended Death Cleanup Lubbock TX" } },
-        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Trauma Scene Cleanup Lubbock TX" } }
-      ]
-    }
+    priceRange: '$$',
+    paymentAccepted: 'Insurance, Cash, Credit Card',
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Biohazard Cleanup Services',
+      itemListElement: [
+        {
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name: 'Crime Scene Cleanup Lubbock TX' },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name: 'Biohazard Cleanup Lubbock TX' },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name: 'Suicide Cleanup Lubbock TX' },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name: 'Unattended Death Cleanup Lubbock TX' },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name: 'Trauma Scene Cleanup Lubbock TX' },
+        },
+      ],
+    },
   };
   return `<script type="application/ld+json">${JSON.stringify(schema, null, 2)}<\/script>`;
 }
@@ -190,11 +213,11 @@ function renderContactCard(title = 'Request Immediate Help') {
 
 // FAQ accordion
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.faq-q').forEach(btn => {
+  document.querySelectorAll('.faq-q').forEach((btn) => {
     btn.addEventListener('click', () => {
       const item = btn.closest('.faq-item');
       const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      document.querySelectorAll('.faq-item').forEach((i) => i.classList.remove('open'));
       if (!isOpen) item.classList.add('open');
     });
   });

@@ -1,0 +1,11 @@
+{
+  "name": "digital-landlord",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write \"**/*.{html,css,js,json}\"",
+    "format:check": "prettier --check \"**/*.{html,css,js,json}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3"
+  }
+}

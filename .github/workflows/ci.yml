@@ -1,0 +1,112 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [main]
+
+jobs:
+  # ── Format check ────────────────────────────────────────────────────────────
+  lint:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+
+  # ── Detect which sites changed ───────────────────────────────────────────────
+  # Outputs a JSON array of site folder names, e.g. ["lubbockbiohazardcleanup"]
+  # If anything under shared/ changed, all sites are included.
+  detect:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    outputs:
+      sites: ${{ steps.changed.outputs.sites }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: changed
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            DIFF=$(git diff --name-only "origin/${{ github.base_ref }}"...HEAD)
+          elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            # First push to branch — deploy every site
+            DIFF=$(find sites -mindepth 1 -maxdepth 1 -type d -printf '%P\n' | sed 's|^|sites/|')
+          else
+            DIFF=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}")
+          fi
+
+          if echo "$DIFF" | grep -q "^shared/"; then
+            SITES=$(ls sites/)
+          else
+            SITES=$(echo "$DIFF" | grep "^sites/" | cut -d/ -f2 | sort -u)
+          fi
+
+          JSON=$(echo "$SITES" | grep -v '^$' | jq -R . | jq -sc .)
+          echo "sites=$JSON" >> "$GITHUB_OUTPUT"
+          echo "Changed sites: $JSON"
+
+  # ── Deploy changed sites ─────────────────────────────────────────────────────
+  # Secret per site: AZURE_STATIC_WEB_APPS_API_TOKEN_<folder-name>
+  # e.g. AZURE_STATIC_WEB_APPS_API_TOKEN_lubbockbiohazardcleanup
+  deploy:
+    needs: [lint, detect]
+    if: |
+      github.event.action != 'closed' &&
+      needs.detect.outputs.sites != '[]' &&
+      needs.detect.outputs.sites != ''
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        site: ${{ fromJson(needs.detect.outputs.sites) }}
+    name: Deploy ${{ matrix.site }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          lfs: false
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets[format('AZURE_STATIC_WEB_APPS_API_TOKEN_{0}', matrix.site)] }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: /sites/${{ matrix.site }}
+          api_location: ''
+          output_location: ''
+
+  # ── Close PR preview environments ────────────────────────────────────────────
+  list-sites:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    outputs:
+      sites: ${{ steps.list.outputs.sites }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        run: |
+          JSON=$(ls sites/ | jq -R . | jq -sc .)
+          echo "sites=$JSON" >> "$GITHUB_OUTPUT"
+
+  close-pr:
+    needs: list-sites
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        site: ${{ fromJson(needs.list-sites.outputs.sites) }}
+    name: Close PR for ${{ matrix.site }}
+    steps:
+      - name: Close ${{ matrix.site }} preview
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets[format('AZURE_STATIC_WEB_APPS_API_TOKEN_{0}', matrix.site)] }}
+          action: close
