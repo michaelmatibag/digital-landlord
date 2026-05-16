@@ -23,36 +23,33 @@ jobs:
 
   # ── Detect which sites changed ───────────────────────────────────────────────
   # Outputs a JSON array of site folder names, e.g. ["lubbockbiohazardcleanup"]
-  # If anything under shared/ changed, all sites are included.
+  # Add a new filter entry here whenever a new site folder is created.
+  # If anything under shared/ changed, all sites are deployed.
   detect:
     if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     outputs:
-      sites: ${{ steps.changed.outputs.sites }}
+      sites: ${{ steps.sites.outputs.sites }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v4
+        id: filter
         with:
-          fetch-depth: 0
-      - id: changed
+          filters: |
+            lubbockbiohazardcleanup:
+              - 'sites/lubbockbiohazardcleanup/**'
+            shared:
+              - 'shared/**'
+      - id: sites
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            DIFF=$(git diff --name-only "origin/${{ github.base_ref }}"...HEAD)
-          elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
-            # First push to branch — deploy every site
-            DIFF=$(find sites -mindepth 1 -maxdepth 1 -type d -printf '%P\n' | sed 's|^|sites/|')
+          CHANGES='${{ steps.filter.outputs.changes }}'
+          if echo "$CHANGES" | jq -e 'contains(["shared"])' > /dev/null; then
+            SITES=$(ls sites/ | jq -R . | jq -sc .)
           else
-            DIFF=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}")
+            SITES=$(echo "$CHANGES" | jq '[.[] | select(. != "shared")]')
           fi
-
-          if echo "$DIFF" | grep -q "^shared/"; then
-            SITES=$(ls sites/)
-          else
-            SITES=$(echo "$DIFF" | grep "^sites/" | cut -d/ -f2 | sort -u)
-          fi
-
-          JSON=$(echo "$SITES" | grep -v '^$' | jq -R . | jq -sc .)
-          echo "sites=$JSON" >> "$GITHUB_OUTPUT"
-          echo "Changed sites: $JSON"
+          echo "sites=$SITES" >> "$GITHUB_OUTPUT"
+          echo "Changed sites: $SITES"
 
   # ── Deploy changed sites ─────────────────────────────────────────────────────
   # Secret per site: AZURE_STATIC_WEB_APPS_API_TOKEN_<folder-name>
