@@ -107,13 +107,28 @@
 
     // FAQ accordion
     document.querySelectorAll('.faq-q').forEach(function (btn) {
-      btn.addEventListener('click', function () {
+      btn.setAttribute('tabindex', '0');
+      btn.setAttribute('aria-expanded', 'false');
+
+      function toggleFaq() {
         var item = btn.closest('.faq-item');
         var isOpen = item.classList.contains('open');
         document.querySelectorAll('.faq-item').forEach(function (i) {
           i.classList.remove('open');
+          i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
         });
-        if (!isOpen) item.classList.add('open');
+        if (!isOpen) {
+          item.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      }
+
+      btn.addEventListener('click', toggleFaq);
+      btn.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleFaq();
+        }
       });
     });
   });
