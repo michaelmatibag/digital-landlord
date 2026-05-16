@@ -3,7 +3,8 @@ const hamburger = document.querySelector('.hamburger');
 const mobileNav = document.querySelector('.mobile-nav');
 if (hamburger && mobileNav) {
   hamburger.addEventListener('click', () => {
-    mobileNav.classList.toggle('open');
+    const isOpen = mobileNav.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   });
 }
 
