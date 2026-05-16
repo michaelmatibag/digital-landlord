@@ -43,7 +43,7 @@ jobs:
           if echo "$CHANGES" | jq -e 'contains(["shared"])' > /dev/null; then
             SITES=$(ls sites/ | jq -R . | jq -sc .)
           else
-            SITES=$(echo "$CHANGES" | jq '[.[] | select(. != "shared")]')
+            SITES=$(echo "$CHANGES" | jq -c '[.[] | select(. != "shared")]')
           fi
           echo "sites=$SITES" >> "$GITHUB_OUTPUT"
           echo "Changed sites: $SITES"
