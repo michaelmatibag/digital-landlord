@@ -31,7 +31,8 @@ digital-landlord/
 │       ├── js/site.js
 │       ├── robots.txt
 │       ├── sitemap.xml
-│       └── staticwebapp.config.json
+│       ├── staticwebapp.config.json
+│       └── google*.html          ← Google Search Console verification (do not delete)
 ├── shared/
 │   ├── css/    ← Common styles (future use)
 │   └── js/     ← Shared utilities (future use)

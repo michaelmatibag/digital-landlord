@@ -1,6 +1,14 @@
 {
   "name": "digital-landlord",
+  "version": "1.0.0",
+  "description": "Local lead-gen sites deployed to Azure Static Web Apps — one site per folder under sites/",
   "private": true,
+  "author": "Michael Matibag",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michaelmatibag/digital-landlord.git"
+  },
   "scripts": {
     "prepare": "node scripts/sync-layout.js",
     "format": "prettier --write \"**/*.{html,css,js,json}\"",

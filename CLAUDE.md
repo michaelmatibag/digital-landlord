@@ -19,6 +19,46 @@ node scripts/sync-layout.js  # copy shared/js/layout.js into every site's js/ di
 - `sites/<site-name>/js/site.js` — site-specific config (passed to the shared layout engine).
 - HTML pages use JS-rendered mount points; static header/footer markup is not duplicated across pages.
 
+## SITE object schema
+
+Every site's `js/site.js` exports a global `SITE` object consumed by `shared/js/layout.js`. All fields are required:
+
+```javascript
+var SITE = {
+  name: 'Business Name',           // displayed in header logo and footer
+  tagline: 'City • Certified • 24/7',
+  phone: {
+    display: '(555) 555-5555',     // shown in top bar, header, footer
+    href: 'tel:+15555555555',      // used in all tel: links
+  },
+  address: 'City, ST 00000',       // footer address line
+  nav: [                           // header + mobile nav links
+    { href: '/', label: 'Home' },
+    // ...
+  ],
+  footerServices: [                // services column in footer
+    { href: 'services.html#anchor', label: 'Service Name' },
+    // ...
+  ],
+  footerDesc: 'Short business description for footer.',
+  footerNote: 'Certifications • Tagline',
+};
+```
+
+## Troubleshooting
+
+**Layout not rendering (header/footer blank)**
+- Ensure `js/site.js` is loaded before `js/layout.js` in every HTML file.
+- Run `node scripts/sync-layout.js` — `js/layout.js` inside each site is a copy; editing `shared/js/layout.js` alone has no effect until synced.
+
+**Form submissions not working**
+- Verify the Formspree endpoint in each form's `action` attribute is the correct project ID.
+- The `_gotcha` honeypot field must be present and empty; Formspree rejects submissions if it is missing.
+
+**Deploy failed — empty or missing token**
+- Check that `AZURE_STATIC_WEB_APPS_API_TOKEN_<site-name>` exists as a GitHub Actions secret (Settings → Secrets → Actions).
+- The secret name must exactly match the uppercased, hyphen-to-underscore version of the site folder name.
+
 ## Adding a new site
 
 1. Create `sites/<site-name>/` with the standard structure (HTML pages, `css/`, `js/site.js`, `staticwebapp.config.json`, `sitemap.xml`).

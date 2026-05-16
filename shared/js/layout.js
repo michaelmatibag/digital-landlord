@@ -3,7 +3,7 @@
 (function () {
   if (typeof SITE === 'undefined') {
     console.error(
-      'layout.js: SITE is not defined. Ensure js/site.js is loaded before js/layout.js.',
+      'layout.js: SITE is not defined. Ensure js/site.js is loaded before js/layout.js.'
     );
     return;
   }
@@ -40,13 +40,13 @@
           </ul>
         </nav>
         <a href="${SITE.phone.href}" class="nav-phone">${SITE.phone.display}</a>
-        <button class="hamburger" aria-label="Open menu">
+        <button class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
           <span></span>
           <span></span>
           <span></span>
         </button>
       </div>
-      <nav class="mobile-nav">
+      <nav class="mobile-nav" id="mobile-nav">
         ${mobileNavItems}
         <a href="${SITE.phone.href}" style="color: #d4a843; font-weight: 700; font-size: 20px; margin-top: 8px">
           ${SITE.phone.display}
