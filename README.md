@@ -28,7 +28,7 @@ digital-landlord/
 │       ├── about.html
 │       ├── contact.html
 │       ├── css/style.css
-│       ├── js/layout.js
+│       ├── js/site.js
 │       ├── robots.txt
 │       ├── sitemap.xml
 │       └── staticwebapp.config.json
@@ -56,7 +56,7 @@ Each site in `sites/` gets its own Azure Static Web App resource.
 ## Adding a New Site
 
 1. Copy an existing site folder: `cp -r sites/lubbockbiohazardcleanup sites/yourcity-niche`
-2. Update `js/layout.js` — phone, business name, city, Formspree ID
+2. Update `js/site.js` — phone, business name, city, Formspree ID
 3. Update all HTML — title tags, meta descriptions, content
 4. Update `sitemap.xml` and `robots.txt` URLs
 5. Create new Azure Static Web App pointing to the new folder

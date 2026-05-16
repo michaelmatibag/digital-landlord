@@ -1,6 +1,13 @@
 // Shared layout engine. Do not edit per-site — update this file only.
 // Each site provides a SITE config object via js/site.js loaded before this script.
 (function () {
+  if (typeof SITE === 'undefined') {
+    console.error(
+      'layout.js: SITE is not defined. Ensure js/site.js is loaded before js/layout.js.',
+    );
+    return;
+  }
+
   function renderTopBar() {
     return `<div class="top-bar">
       Available 24/7 for emergencies &mdash;

@@ -101,9 +101,26 @@
         <div class="hero-card">
           <div class="hero-card-title">Request Immediate Assistance</div>
           <form class="contact-form" action="https://formspree.io/f/xzdonzkp" method="post">
-            <input type="text" name="name" placeholder="Your name" required />
-            <input type="tel" name="phone" placeholder="Best phone number" required />
-            <select name="service">
+            <label for="hero-name" class="sr-only">Your name</label>
+            <input
+              id="hero-name"
+              type="text"
+              name="name"
+              placeholder="Your name"
+              autocomplete="name"
+              required
+            />
+            <label for="hero-phone" class="sr-only">Best phone number</label>
+            <input
+              id="hero-phone"
+              type="tel"
+              name="phone"
+              placeholder="Best phone number"
+              autocomplete="tel"
+              required
+            />
+            <label for="hero-service" class="sr-only">Type of incident</label>
+            <select id="hero-service" name="service">
               <option value="">Type of incident...</option>
               <option>Unattended Death</option>
               <option>Homicide / Crime Scene</option>
@@ -112,7 +129,12 @@
               <option>Hoarding Cleanup</option>
               <option>Other</option>
             </select>
-            <textarea name="message" placeholder="Brief description (optional)"></textarea>
+            <label for="hero-message" class="sr-only">Brief description (optional)</label>
+            <textarea
+              id="hero-message"
+              name="message"
+              placeholder="Brief description (optional)"
+            ></textarea>
             <input
               type="text"
               name="_gotcha"

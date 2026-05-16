@@ -11,8 +11,16 @@ const sitesDir = path.join(root, 'sites');
 
 fs.readdirSync(sitesDir).forEach((site) => {
   const jsDir = path.join(sitesDir, site, 'js');
-  if (!fs.existsSync(jsDir)) return;
+  if (!fs.existsSync(jsDir)) {
+    console.warn(`warning: skipping ${site} — no js/ directory found`);
+    return;
+  }
   const dest = path.join(jsDir, 'layout.js');
-  fs.copyFileSync(src, dest);
-  console.log(`synced → sites/${site}/js/layout.js`);
+  try {
+    fs.copyFileSync(src, dest);
+    console.log(`synced → sites/${site}/js/layout.js`);
+  } catch (err) {
+    console.error(`error: failed to sync ${site}: ${err.message}`);
+    process.exit(1);
+  }
 });
