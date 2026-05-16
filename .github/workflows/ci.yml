@@ -83,6 +83,19 @@ jobs:
           api_location: ''
           output_location: ''
 
+  # ── Stable rollup for branch protection ─────────────────────────────────────
+  # Branch protection requires a fixed job name. Matrix job names are dynamic
+  # ("Deploy lubbockbiohazardcleanup"), so this job provides a stable target.
+  deploy-complete:
+    needs: deploy
+    if: |
+      always() &&
+      github.event.action != 'closed' &&
+      (needs.deploy.result == 'success' || needs.deploy.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All deploys passed or no sites changed."
+
   # ── Close PR preview environments ────────────────────────────────────────────
   list-sites:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
